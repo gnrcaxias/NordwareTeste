@@ -1,0 +1,6 @@
+@Nordware_HostAddress = http://localhost:5183
+
+GET {{Nordware_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

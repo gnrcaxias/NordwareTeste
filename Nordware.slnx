@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Nordware.Api/Nordware.Api.csproj" />
+  <Project Path="Nordware.Application/Nordware.Application.csproj" />
+  <Project Path="Nordware.Domain/Nordware.Domain.csproj" />
+  <Project Path="Nordware.Infrastructure/Nordware.Infrastructure.csproj" />
+  <Project Path="Nordware.Tests/Nordware.Tests.csproj" />
+</Solution>
