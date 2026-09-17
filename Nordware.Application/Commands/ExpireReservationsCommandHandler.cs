@@ -7,13 +7,14 @@ namespace Nordware.Application.Commands;
 public sealed class ExpireReservationsCommandHandler : IRequestHandler<ExpireReservationsCommand>
 {
     private readonly IReservationRepository _reservationRepository;
-
     private readonly IProductRepository _productRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ExpireReservationsCommandHandler(IReservationRepository reservationRepository, IProductRepository productRepository)
+    public ExpireReservationsCommandHandler(IReservationRepository reservationRepository, IProductRepository productRepository, IUnitOfWork unitOfWork)
     {
         _reservationRepository = reservationRepository;
         _productRepository = productRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task Handle(ExpireReservationsCommand request, CancellationToken cancellationToken)
@@ -30,6 +31,6 @@ public sealed class ExpireReservationsCommandHandler : IRequestHandler<ExpireRes
         }
 
         if (reservations.Count > 0)
-            await _reservationRepository.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.TrySaveChangesAsync(cancellationToken);
     }
 }

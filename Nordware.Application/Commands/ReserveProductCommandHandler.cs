@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Nordware.Application.Abstractions.Persistence;
+using Nordware.Application.Abstractions.Service;
 using Nordware.Application.DTOs;
 using Nordware.Application.Exceptions;
 using Nordware.Domain.Entities;
@@ -7,22 +8,27 @@ using Nordware.Domain.Enums;
 
 namespace Nordware.Application.Commands;
 
-public sealed class ReserveProductCommandHandler: IRequestHandler<ReserveProductCommand, ReservationResponse>
+public sealed class ReserveProductCommandHandler
+    : IRequestHandler<ReserveProductCommand, ReservationResponse>
 {
     private readonly IProductRepository _productRepository;
     private readonly ICustomerRepository _customerRepository;
     private readonly IReservationRepository _reservationRepository;
     private readonly IReservationExpirationService _expirationService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ReserveProductCommandHandler(IProductRepository productRepository, 
-                                        ICustomerRepository customerRepository, 
-                                        IReservationRepository reservationRepository, 
-                                        IReservationExpirationService expirationService)
+    public ReserveProductCommandHandler(
+                                        IProductRepository productRepository,
+                                        ICustomerRepository customerRepository,
+                                        IReservationRepository reservationRepository,
+                                        IReservationExpirationService expirationService,
+                                        IUnitOfWork unitOfWork)
     {
         _productRepository = productRepository;
         _customerRepository = customerRepository;
         _reservationRepository = reservationRepository;
         _expirationService = expirationService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<ReservationResponse> Handle(ReserveProductCommand request, CancellationToken cancellationToken)
@@ -37,34 +43,31 @@ public sealed class ReserveProductCommandHandler: IRequestHandler<ReserveProduct
         if (product is null)
             throw new ProductNotFoundException(request.ProductId);
 
-        var activeReservation =
-            await _reservationRepository.GetActiveByProductIdAsync(request.ProductId, cancellationToken);
+        var activeReservation = await _reservationRepository.GetActiveByProductIdAsync(request.ProductId, cancellationToken);
 
         if (activeReservation is not null)
         {
-            var expired =
-                await _expirationService.ExpireIfNecessaryAsync(activeReservation, cancellationToken);
+            var expired = await _expirationService.ExpireIfNecessaryAsync(activeReservation, cancellationToken);
 
             if (!expired)
                 throw new ProductUnavailableException(request.ProductId);
         }
 
+        if (product.Status != ProductStatus.Available)
+            throw new ProductUnavailableException(request.ProductId);
+
         product.Reserve();
 
         var now = DateTime.UtcNow;
 
-        var reservation = new Reservation(
-            Guid.NewGuid(),
-            product.Id,
-            customer.Id,
-            now);
+        var reservation = new Reservation(Guid.NewGuid(), product.Id, customer.Id, now);
 
-        await _reservationRepository.AddAsync(
-            reservation,
-            cancellationToken);
+        await _reservationRepository.AddAsync(reservation, cancellationToken);
 
-        await _reservationRepository.SaveChangesAsync(
-            cancellationToken);
+        var committed = await _unitOfWork.TrySaveChangesAsync(cancellationToken);
+
+        if (!committed)
+            throw new ProductUnavailableException(request.ProductId);
 
         return ReservationResponse.FromEntity(reservation);
     }

@@ -10,7 +10,5 @@ public interface IReservationRepository
 
     Task<IReadOnlyList<Reservation>> GetByCustomerIdAsync(Guid customerId, CancellationToken cancellationToken = default);
 
-    Task SaveChangesAsync(CancellationToken cancellationToken = default);
-
     Task<IReadOnlyList<Reservation>> GetExpiredActiveAsync(DateTime now, CancellationToken cancellationToken = default);
 }

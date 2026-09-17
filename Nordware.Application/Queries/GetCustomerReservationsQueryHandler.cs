@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Nordware.Application.Abstractions.Persistence;
+using Nordware.Application.Abstractions.Service;
 using Nordware.Application.DTOs;
 using Nordware.Application.Exceptions;
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Nordware.Application.Abstractions.Persistence;
+using Nordware.Application.Abstractions.Service;
 using Nordware.Application.Services;
 
 namespace Nordware.Application

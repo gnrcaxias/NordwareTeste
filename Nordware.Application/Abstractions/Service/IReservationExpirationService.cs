@@ -1,6 +1,6 @@
 ﻿using Nordware.Domain.Entities;
 
-namespace Nordware.Application.Abstractions.Persistence;
+namespace Nordware.Application.Abstractions.Service;
 
 public interface IReservationExpirationService
 {

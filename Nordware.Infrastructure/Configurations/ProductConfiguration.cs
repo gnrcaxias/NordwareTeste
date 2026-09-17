@@ -16,6 +16,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.Status)
                        .HasConversion<string>()
-                       .IsRequired();
+                       .IsRequired()
+                       .IsConcurrencyToken();
     }
 }

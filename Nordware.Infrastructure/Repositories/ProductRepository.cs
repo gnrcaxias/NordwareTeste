@@ -12,7 +12,4 @@ public sealed class ProductRepository(AppDbContext db) : IProductRepository
 
     public async Task<IReadOnlyCollection<Product>> GetAllAsync(CancellationToken cancellationToken) =>
         await db.Products.AsNoTracking().ToListAsync(cancellationToken);
-
-    public Task SaveChangesAsync(CancellationToken cancellationToken) =>
-        db.SaveChangesAsync(cancellationToken);
 }

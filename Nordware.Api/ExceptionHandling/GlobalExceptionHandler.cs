@@ -6,23 +6,13 @@ namespace Nordware.Api.ExceptionHandling;
 
 public sealed class GlobalExceptionHandler : IExceptionHandler
 {
-    private readonly ILogger<GlobalExceptionHandler> _logger;
-
-    public GlobalExceptionHandler(
-        ILogger<GlobalExceptionHandler> logger)
-    {
-        _logger = logger;
-    }
+    public GlobalExceptionHandler() {  }
 
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
         Exception exception,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(
-            exception,
-            "Ocorreu uma exceção não tratada.");
-
         var (statusCode, title) = exception switch
         {
             ProductNotFoundException =>
@@ -42,12 +32,17 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                     StatusCodes.Status404NotFound,
                     "Reserva não encontrada"
                 ),
-
             ReservationNotOwnedException =>
                 (
                     StatusCodes.Status403Forbidden,
                     "Reserva não pertence ao cliente"
                 ),
+
+            ReservationExpiredException =>
+            (
+                StatusCodes.Status409Conflict,
+                "Reserva expirada"
+            ),
 
             ArgumentException =>
                 (StatusCodes.Status400BadRequest,

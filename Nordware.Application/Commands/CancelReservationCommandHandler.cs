@@ -1,35 +1,32 @@
 ﻿using MediatR;
 using Nordware.Application.Abstractions.Persistence;
+using Nordware.Application.Abstractions.Service;
 using Nordware.Application.Exceptions;
 using Nordware.Application.Services;
+using System.Data;
 
 namespace Nordware.Application.Commands;
 
 public sealed class CancelReservationCommandHandler
     : IRequestHandler<CancelReservationCommand>
 {
-    private readonly IReservationRepository
-        _reservationRepository;
+    private readonly IReservationRepository _reservationRepository;
+    private readonly IProductRepository _productRepository;
+    private readonly IReservationExpirationService _expirationService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    private readonly IProductRepository
-        _productRepository;
-
-    private readonly IReservationExpirationService
-        _expirationService;
-
-    public CancelReservationCommandHandler(
-        IReservationRepository reservationRepository,
-        IProductRepository productRepository,
-        IReservationExpirationService expirationService)
+    public CancelReservationCommandHandler(IReservationRepository reservationRepository,
+                                            IProductRepository productRepository,
+                                            IReservationExpirationService expirationService,
+                                            IUnitOfWork unitOfWork)
     {
         _reservationRepository = reservationRepository;
         _productRepository = productRepository;
         _expirationService = expirationService;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task Handle(
-        CancelReservationCommand request,
-        CancellationToken cancellationToken)
+    public async Task Handle(CancelReservationCommand request, CancellationToken cancellationToken)
     {
         var reservation = await _reservationRepository.GetActiveByProductIdAsync(request.ProductId, cancellationToken);
 
@@ -51,7 +48,9 @@ public sealed class CancelReservationCommandHandler
 
         product?.Release();
 
-        await _reservationRepository.SaveChangesAsync(cancellationToken);
+        var committed = await _unitOfWork.TrySaveChangesAsync(cancellationToken);
+
+        if (!committed)
+            throw new ConcurrencyException();
     }
-}
             

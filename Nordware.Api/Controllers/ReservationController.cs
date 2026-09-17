@@ -1,20 +1,15 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Nordware.Application.Commands;
+using Nordware.Application.DTOs;
+
 
 namespace Nordware.Api.Controllers;
 
 [ApiController]
 [Route("products")]
-public sealed class ReservationController : ControllerBase
+public sealed class ReservationController(IMediator mediator) : ControllerBase
 {
-    private readonly ISender _sender;
-
-    public ReservationController(ISender sender)
-    {
-        _sender = sender;
-    }
-
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -22,13 +17,15 @@ public sealed class ReservationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Produces("application/json")]
     [HttpPost("{id:guid}/reserve")]
-    public async Task<IActionResult> Reserve(Guid id, [FromQuery] Guid customerId, CancellationToken cancellationToken)
+    public async Task<ActionResult<ReservationResponse>> Reserve(Guid id, [FromQuery] Guid customerId, CancellationToken cancellationToken)
     {
         var command = new ReserveProductCommand(id, customerId);
 
-        var result = await _sender.Send(command, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
-        return Ok(result);
+        return StatusCode(
+            StatusCodes.Status201Created,
+            result);
     }
 
     [HttpDelete("{id:guid}/reserve")]
@@ -40,7 +37,7 @@ public sealed class ReservationController : ControllerBase
         [FromQuery] Guid customerId,
         CancellationToken cancellationToken)
     {
-        await _sender.Send(new CancelReservationCommand(id, customerId), cancellationToken);
+        await mediator.Send(new CancelReservationCommand(id, customerId), cancellationToken);
 
         return NoContent();
     }

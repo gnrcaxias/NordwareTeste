@@ -39,11 +39,6 @@ public sealed class ReservationRepository : IReservationRepository
             .ToListAsync(cancellationToken);
     }
 
-    public Task SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        return _context.SaveChangesAsync(cancellationToken);
-    }
-
     public async Task<IReadOnlyList<Reservation>>GetExpiredActiveAsync(DateTime now, CancellationToken cancellationToken = default)
     {
         return await _context.Reservations
