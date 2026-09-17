@@ -4,7 +4,7 @@ namespace Nordware.Application.Abstractions.Persistence;
 
 public interface ICustomerRepository
 {
-    Task<Customer?> GetByIdAsync(
-        Guid id,
-        CancellationToken cancellationToken = default);
+    Task<Customer?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<Customer>> GetAllAsync(CancellationToken cancellationToken = default);
 }
