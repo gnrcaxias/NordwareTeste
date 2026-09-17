@@ -18,7 +18,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.ApplyConfiguration(new ProductConfiguration());
         modelBuilder.ApplyConfiguration(new CustomerConfiguration());
-
+        modelBuilder.ApplyConfiguration(new ReservationConfiguration());
 
     }
 }

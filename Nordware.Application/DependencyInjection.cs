@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Nordware.Application.Abstractions.Persistence;
+using Nordware.Application.Services;
 
 namespace Nordware.Application
 {
@@ -9,8 +11,9 @@ namespace Nordware.Application
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
 
+            services.AddScoped<IReservationExpirationService, ReservationExpirationService>();
+
             return services;
         }
-
     }
 }

@@ -20,7 +20,7 @@ public sealed class Product
     public ProductStatus Status { get; private set; }
 
     public void Reserve()
-    {
+    { 
         if (Status != ProductStatus.Available)
             throw new InvalidOperationException(
                 "Produto não está disponível para reserva.");

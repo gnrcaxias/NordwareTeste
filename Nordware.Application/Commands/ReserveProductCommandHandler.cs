@@ -12,12 +12,17 @@ public sealed class ReserveProductCommandHandler: IRequestHandler<ReserveProduct
     private readonly IProductRepository _productRepository;
     private readonly ICustomerRepository _customerRepository;
     private readonly IReservationRepository _reservationRepository;
+    private readonly IReservationExpirationService _expirationService;
 
-    public ReserveProductCommandHandler(IProductRepository productRepository, ICustomerRepository customerRepository, IReservationRepository reservationRepository)
+    public ReserveProductCommandHandler(IProductRepository productRepository, 
+                                        ICustomerRepository customerRepository, 
+                                        IReservationRepository reservationRepository, 
+                                        IReservationExpirationService expirationService)
     {
         _productRepository = productRepository;
         _customerRepository = customerRepository;
         _reservationRepository = reservationRepository;
+        _expirationService = expirationService;
     }
 
     public async Task<ReservationResponse> Handle(ReserveProductCommand request, CancellationToken cancellationToken)
@@ -32,8 +37,17 @@ public sealed class ReserveProductCommandHandler: IRequestHandler<ReserveProduct
         if (product is null)
             throw new ProductNotFoundException(request.ProductId);
 
-        if (product.Status != ProductStatus.Available)
-            throw new ProductUnavailableException(request.ProductId);
+        var activeReservation =
+            await _reservationRepository.GetActiveByProductIdAsync(request.ProductId, cancellationToken);
+
+        if (activeReservation is not null)
+        {
+            var expired =
+                await _expirationService.ExpireIfNecessaryAsync(activeReservation, cancellationToken);
+
+            if (!expired)
+                throw new ProductUnavailableException(request.ProductId);
+        }
 
         product.Reserve();
 

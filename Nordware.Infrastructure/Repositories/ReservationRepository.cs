@@ -43,4 +43,13 @@ public sealed class ReservationRepository : IReservationRepository
     {
         return _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Reservation>>GetExpiredActiveAsync(DateTime now, CancellationToken cancellationToken = default)
+    {
+        return await _context.Reservations
+            .Where(x =>
+                x.Status == ReservationStatus.Active &&
+                x.ExpiresAt <= now)
+            .ToListAsync(cancellationToken);
+    }
 }
