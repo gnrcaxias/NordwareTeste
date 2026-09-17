@@ -15,6 +15,7 @@ public static class DependencyInjection
             options.UseInMemoryDatabase("Nordware"));
 
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
 
         return services;
     }
