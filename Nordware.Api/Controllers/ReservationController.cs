@@ -30,4 +30,18 @@ public sealed class ReservationController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpDelete("{id:guid}/reserve")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Cancel(
+        Guid id,
+        [FromQuery] Guid customerId,
+        CancellationToken cancellationToken)
+    {
+        await _sender.Send(new CancelReservationCommand(id, customerId), cancellationToken);
+
+        return NoContent();
+    }
 }

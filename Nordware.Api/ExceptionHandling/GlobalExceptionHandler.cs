@@ -37,6 +37,18 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 (StatusCodes.Status409Conflict,
                  "Produto indisponível"),
 
+            ReservationNotFoundException =>
+                (
+                    StatusCodes.Status404NotFound,
+                    "Reserva não encontrada"
+                ),
+
+            ReservationNotOwnedException =>
+                (
+                    StatusCodes.Status403Forbidden,
+                    "Reserva não pertence ao cliente"
+                ),
+
             ArgumentException =>
                 (StatusCodes.Status400BadRequest,
                  "Requisição inválida"),

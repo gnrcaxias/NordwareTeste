@@ -20,13 +20,19 @@ public sealed class ReservationExpirationBackgroundService : BackgroundService
     {
         using var timer = new PeriodicTimer(_interval);
 
-        while (await timer.WaitForNextTickAsync(stoppingToken))
+        try
         {
-            using var scope = _scopeFactory.CreateScope();
+            while (await timer.WaitForNextTickAsync(stoppingToken))
+            {
+                using var scope = _scopeFactory.CreateScope();
 
-            var sender = scope.ServiceProvider.GetRequiredService<ISender>();
+                var sender = scope.ServiceProvider.GetRequiredService<ISender>();
 
-            await sender.Send(new ExpireReservationsCommand(), stoppingToken);
+                await sender.Send(new ExpireReservationsCommand(), stoppingToken);
+            }
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
         }
     }
 }

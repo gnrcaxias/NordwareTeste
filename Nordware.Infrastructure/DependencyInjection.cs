@@ -19,8 +19,6 @@ public static class DependencyInjection
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IReservationRepository, ReservationRepository>();
 
-        services.AddScoped<IReservationExpirationService, ReservationExpirationService>();
-
         services.AddHostedService<ReservationExpirationBackgroundService>();
 
         return services;

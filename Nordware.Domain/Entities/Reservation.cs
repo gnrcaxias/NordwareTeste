@@ -36,8 +36,7 @@ public sealed class Reservation
 
     public bool IsExpired(DateTime now)
     {
-        return Status == ReservationStatus.Active &&
-               ExpiresAt <= now;
+        return Status == ReservationStatus.Active && ExpiresAt <= now;
     }
 
     public void Expire()
