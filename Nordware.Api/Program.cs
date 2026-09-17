@@ -1,11 +1,8 @@
-using ECommerce.Reservations.Infrastructure;
-using ECommerce.Reservations.Infrastructure.Persistence;
-using Nordware.Application;
+using Nordware.Infrastructure;
 using Nordware.Infrastructure.Persistence;
+using Nordware.Application;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 

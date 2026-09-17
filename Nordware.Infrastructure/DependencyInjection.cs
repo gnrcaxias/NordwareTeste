@@ -4,7 +4,7 @@ using Nordware.Application.Abstractions.Persistence;
 using Nordware.Infrastructure.Persistence;
 using Nordware.Infrastructure.Repositories;
 
-namespace ECommerce.Reservations.Infrastructure;
+namespace Nordware.Infrastructure;
 
 public static class DependencyInjection
 {
