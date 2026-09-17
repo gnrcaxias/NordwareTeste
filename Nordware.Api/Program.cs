@@ -1,18 +1,31 @@
+using ECommerce.Reservations.Infrastructure;
+using ECommerce.Reservations.Infrastructure.Persistence;
+using Nordware.Application;
+using Nordware.Infrastructure.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// Gera o documento OpenAPI
 builder.Services.AddOpenApi();
+
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await DbSeeder.SeedAsync(db);
+}
+
 if (app.Environment.IsDevelopment())
 {
-    // Gera /openapi/v1.json
     app.MapOpenApi();
 
-    // Interface Swagger
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint(
