@@ -48,9 +48,7 @@ public sealed class CancelReservationCommandHandler
 
         product?.Release();
 
-        var committed = await _unitOfWork.TrySaveChangesAsync(cancellationToken);
-
-        if (!committed)
-            throw new ConcurrencyException();
+        await _unitOfWork.TrySaveChangesAsync(cancellationToken);
     }
+}
             
