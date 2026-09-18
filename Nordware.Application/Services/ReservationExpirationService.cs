@@ -31,6 +31,6 @@ public sealed class ReservationExpirationService : IReservationExpirationService
 
         var committed = await _unitOfWork.TrySaveChangesAsync(cancellationToken);
 
-        return true;
+        return committed;
     }
 }

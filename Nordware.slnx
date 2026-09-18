@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Readme.MD" />
+  </Folder>
   <Project Path="Nordware.Api/Nordware.Api.csproj" />
   <Project Path="Nordware.Application/Nordware.Application.csproj" />
   <Project Path="Nordware.Domain/Nordware.Domain.csproj" />
